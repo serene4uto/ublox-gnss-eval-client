@@ -3,7 +3,7 @@
 # TCP Server Connection Settings
 tcp:
   host: "192.168.10.137"
-  port: 5000
+  port: 50012
 
 # Evaluation Parameters
 evaluation:
@@ -11,8 +11,8 @@ evaluation:
 
 # Ground Truth Coordinates
 ground_truth:
-  latitude: null
-  longitude: null
+  latitude: 36.111165
+  longitude: 128.384272
 
 # Logging Configuration
 logging:

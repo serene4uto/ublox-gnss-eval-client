@@ -107,7 +107,8 @@ def evaluate_data(json_str, gt_latitude, gt_longitude):
         northing_error = None
         easting_error = None
         horizontal_error_2d = None # Horizontal Position Error (HPE) in meters
-        if gt_latitude is None or gt_longitude is None:
+        
+        if gt_latitude is not None and gt_longitude is not None:
             # Transform current and ground truth coordinates to UTM
             easting, northing = transformer(lon, lat)
             gt_easting, gt_northing = transformer(gt_longitude, gt_latitude)
@@ -276,6 +277,7 @@ def processor_thread_func(
                 msg_rate_from_q = data[1]
 
         if msg_str_from_q: # Check if a message was actually popped
+            # print(f"gt_lat: {gt_lat}, gt_lon: {gt_lon}")
             processed_info = evaluate_data(msg_str_from_q, gt_lat, gt_lon)
 
 
