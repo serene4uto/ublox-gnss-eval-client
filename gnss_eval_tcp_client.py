@@ -309,7 +309,7 @@ def processor_thread_func(
 
         console_logger.info(f"CONSOLE_REPORT | {' | '.join(console_report_str_parts)} (Report @ {eval_hz}Hz)")
 
-        if log_file_handle:
+        if processed_info and log_file_handle:
             try:
                 log_file_handle.write(','.join(map(str, report_data_fields_list)) + "\n")
                 log_file_handle.flush() # Ensure data is written to disk periodically
