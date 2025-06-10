@@ -7,7 +7,7 @@ tcp:
 
 # Evaluation Parameters
 evaluation:
-  rate_hz: 120.0 # Processor thread reporting rate in Hz
+  rate_hz: 200.0 # Processor thread reporting rate in Hz
 
 # Ground Truth Coordinates
 ground_truth:
