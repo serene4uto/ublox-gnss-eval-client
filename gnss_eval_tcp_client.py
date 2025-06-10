@@ -104,23 +104,27 @@ def evaluate_data(json_str, gt_latitude, gt_longitude):
         utm_zone = get_utm_zone(lat, lon)
         transformer = pyproj.Proj(proj='utm', zone=utm_zone, ellps='WGS84', south=lat < 0)
 
-        # Transform current and ground truth coordinates to UTM
-        easting, northing = transformer(lon, lat)
-        gt_easting, gt_northing = transformer(gt_longitude, gt_latitude)
+        northing_error = None
+        easting_error = None
+        horizontal_error_2d = None # Horizontal Position Error (HPE) in meters
+        if gt_latitude is None or gt_longitude is None:
+            # Transform current and ground truth coordinates to UTM
+            easting, northing = transformer(lon, lat)
+            gt_easting, gt_northing = transformer(gt_longitude, gt_latitude)
 
-        # Calculate errors
-        northing_error = northing - gt_northing
-        easting_error = easting - gt_easting
-        horizontal_error_2d = math.sqrt(northing_error**2 + easting_error**2) # This is often same as hpe from receiver if fix is good.
+            # Calculate errors
+            northing_error = northing - gt_northing
+            easting_error = easting - gt_easting
+            horizontal_error_2d = math.sqrt(northing_error**2 + easting_error**2) # This is often same as hpe from receiver if fix is good.
 
         processed_info = {
             "timestamp": msg_time, #format_timestamp_to_kst(msg_time),
             "lat": lat,
             "lon": lon,
             "fix_type": str(fix_type),
-            "hpe": horizontal_error_2d, # Horizontal Position Error (HPE) in meters
-            "northing_error": northing_error,
-            "easting_error": easting_error,
+            "hpe": horizontal_error_2d, # Horizontal Position Error in meters
+            "northing_error": northing_error, # Northing error in meters
+            "easting_error": easting_error, # Easting error in meters
         }
         return processed_info
 
@@ -294,13 +298,13 @@ def processor_thread_func(
             ]
             console_report_str_parts = [
                 f"TS_KST:{ts_kst}", f"Lat:{lat_str}", f"Lon:{lon_str}", f"Type:{fix_type}",
-                f"HPE:{hpe_str}m", f"N_Err:{n_err_str}m", f"E_Err:{e_err_str}m",
-                f"MsgRate:{f'{msg_rate_from_q:.2f}' if msg_rate_from_q is not None else 'N/A'}msg/s"
+                f"HPE(m):{hpe_str}", f"N_Err(m):{n_err_str}", f"E_Err(m):{e_err_str}",
+                f"MsgRate(msg/s):{f'{msg_rate_from_q:.2f}' if msg_rate_from_q is not None else 'N/A'}"
             ]
         else: # No valid processed_info (either no message from queue, or evaluate_data returned None)
             current_rate_str = f"{msg_rate_from_q:.2f}" if msg_rate_from_q is not None else "N/A"
             report_data_fields_list = ["N/A"] * 7 + [current_rate_str] # 7 N/A fields + rate
-            console_report_str_parts = [f"MsgRate:{current_rate_str}msg/s", "(No valid GNSS data for this interval)"]
+            console_report_str_parts = [f"MsgRate(msg/s):{current_rate_str}", "(No valid GNSS data for this interval)"]
 
 
         console_logger.info(f"CONSOLE_REPORT | {' | '.join(console_report_str_parts)} (Report @ {eval_hz}Hz)")

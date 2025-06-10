@@ -1,2 +1,4 @@
 pyproj
 streamlit
+matplotlib
+pyyaml
