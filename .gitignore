@@ -1,2 +1,4 @@
 __pycache__
 .gnss_log
+*.kml
+*.csv
