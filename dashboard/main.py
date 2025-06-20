@@ -1,35 +1,57 @@
-import streamlit as st
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
+# dashboard/main.py
+import argparse
+import threading
+from collections import deque
+import socket
+from logging import getLogger, StreamHandler, Formatter
+import time
+from typing import Optional
+import json
+
+from dashboard.utils.logger import logger
+from dashboard.utils.queue import ThreadSafeQueue
+
+
+def arg_parser():
+    parser = argparse.ArgumentParser(description="GNSS Dashboard Client")
+    
+    parser.add_argument(
+        "--host",
+        type=str,
+        default="localhost",
+        help="Host address of the GNSS data server (default: localhost)",
+    )
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=5000,
+        help="Port number of the GNSS data server (default: 5000)",
+    )
+    
+    parser.add_argument(
+        "--log-level",
+        type=str,
+        default="INFO",
+        choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+        help="Set the logging level (default: INFO)",
+    )
+    
+    return parser.parse_args()
 
 def main():
-    # Set page title
-    st.title("📊 Simple Streamlit Dashboard Example")
-
-    # Sidebar controls
-    st.sidebar.header("Controls")
-    num_points = st.sidebar.slider("Number of data points:", 5, 100, 20)
-    color = st.sidebar.color_picker("Pick a color for the plot", "#1f77b4")
-    show_table = st.sidebar.checkbox("Show data table", value=True)
-
-    # Generate data
-    data = {
-        "X": np.arange(num_points),
-        "Y": np.random.randn(num_points).cumsum()
+    args = arg_parser()
+    
+    app_config = {
+        "host": args.host,
+        "port": args.port,
+        "log_level": args.log_level.upper(),
     }
-    df = pd.DataFrame(data)
-
-    # Display selected data
-    st.markdown(f"**Plotting {num_points} random data points:**")
-    fig, ax = plt.subplots()
-    ax.plot(df["X"], df["Y"], color=color)
-    ax.set_xlabel("Index")
-    ax.set_ylabel("Cumulative Sum")
-    st.pyplot(fig)
-
-    if show_table:
-        st.dataframe(df)
+    
+    logger.setLevel(app_config["log_level"])
+    logger.info(f"Starting GNSS Dashboard Client with config: {app_config}")
+    
+    stop_event = threading.Event()
+    data_queue = ThreadSafeQueue(max_size=50) 
 
 if __name__ == "__main__":
     main()
