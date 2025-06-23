@@ -1,5 +1,8 @@
 pyproj
-streamlit
+
 matplotlib
 pyyaml
 pandas
+
+streamlit
+streamlit-dynamic-tabs
