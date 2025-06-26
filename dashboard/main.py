@@ -1,4 +1,6 @@
 # dashboard/main.py
+import sys
+from pathlib import Path
 import argparse
 import threading
 from collections import deque
@@ -10,12 +12,16 @@ import json
 
 import streamlit as st
 
+# Add the project root to Python path
+current_dir = Path(__file__).resolve().parent
+project_root = current_dir.parent
+sys.path.insert(0, str(project_root))
+
 from dashboard.utils.logger import logger
 from dashboard.utils.queue import ThreadSafeQueue
-
 from dashboard.services.gnss_data_tcp_service import GNSSDataTCPService
-
 from dashboard.views.sidebar import Sidebar
+
 
 
 def arg_parser():
@@ -47,12 +53,7 @@ def main():
     # if "services" not in st.session_state:
     #     st.session_state.services = {}
     
-    
-        
-    
-        
-    
-    
+    Sidebar().render()
     
 
 if __name__ == "__main__":

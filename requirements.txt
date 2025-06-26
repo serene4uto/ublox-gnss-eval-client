@@ -4,5 +4,4 @@ matplotlib
 pyyaml
 pandas
 
-streamlit
-streamlit-dynamic-tabs
+streamlit>=1.37.0
