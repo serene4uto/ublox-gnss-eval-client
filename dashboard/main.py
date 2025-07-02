@@ -47,13 +47,13 @@ def main():
     logger.setLevel(app_config["log_level"])
     logger.info(f"Starting GNSS Dashboard Client with config: {app_config}")
     
-    stop_event = threading.Event()
-    data_queue = ThreadSafeQueue(max_size=50) 
+    pages = [
+        st.Page("pages/live_gnss.py", title="Live GNSS", icon="🛰️"),
+        st.Page("pages/log_analysis.py", title="Log Analysis", icon="📊"),
+    ]
+    current_page = st.navigation(pages, position="sidebar", expanded=True)
+    current_page.run()
     
-    # if "services" not in st.session_state:
-    #     st.session_state.services = {}
-    
-    Sidebar().render()
     
 
 if __name__ == "__main__":
