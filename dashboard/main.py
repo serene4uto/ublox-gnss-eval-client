@@ -48,8 +48,9 @@ def main():
     logger.info(f"Starting GNSS Dashboard Client with config: {app_config}")
     
     pages = [
-        st.Page("pages/live_gnss.py", title="Live GNSS", icon="🛰️"),
         st.Page("pages/log_analysis.py", title="Log Analysis", icon="📊"),
+        st.Page("pages/live_gnss.py", title="Live GNSS", icon="🛰️"),
+        
     ]
     current_page = st.navigation(pages, position="sidebar", expanded=True)
     current_page.run()

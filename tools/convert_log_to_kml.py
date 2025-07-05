@@ -8,7 +8,8 @@ ALL_FIX_TYPES = [
     'no-rtk',
     'float-rtk',
     'fixed-rtk',
-    'dead-reckoning'
+    'dead-reckoning',
+    'synced'
 ]
 
 def parse_args():
