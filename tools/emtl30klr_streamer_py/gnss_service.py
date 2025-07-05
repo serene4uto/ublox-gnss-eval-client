@@ -3,6 +3,17 @@ import time
 import collections
 from threading import Thread, Event, Lock
 
+from pyubx2 import (
+    NMEA_PROTOCOL,
+    RTCM3_PROTOCOL,
+    UBX_PROTOCOL,
+    UBXMessage,
+    UBXMessageError,
+    UBXParseError,
+    UBXReader,
+)
+
+
 # For this script to be self-contained, here is a simple implementation 
 # of a thread-safe deque.
 class ThreadSafeDeque:
@@ -47,9 +58,10 @@ class GNSSService:
         self.timeout = timeout
         self.serial_connection = None
         
+        self._ubr:UBXReader = None
         self._stop_event = Event()
         self._thread: Thread = None
-        self._data_queue = ThreadSafeDeque(maxlen=1000)
+        self._data_queue = ThreadSafeDeque(maxlen=100)
     
     def _device_connect(self):
         """
@@ -63,6 +75,7 @@ class GNSSService:
                 baudrate=self.baudrate,
                 timeout=self.timeout
             )
+            self._ubr = UBXReader(self.serial_connection, protfilter=NMEA_PROTOCOL)
             print("Successfully connected to GNSS device.")
             return True
         except serial.SerialException as e:
@@ -94,21 +107,15 @@ class GNSSService:
             
             # --- Data Reading Logic ---
             try:
-                line = self.serial_connection.readline()
-                if not line: # Timeout occurred, loop again
-                    continue
-                
-                # Decode and strip the NMEA sentence
-                message = line.decode('utf-8', errors='ignore').strip()
-                if message:
-                    self._data_queue.append(message)
-
-            except serial.SerialException as e:
-                print(f"Serial error: {e}. Disconnecting...")
-                self._device_disconnect() # Will attempt to reconnect on next loop
+                raw, parsed = self._ubr.read()
+                print(f"Raw data: {raw}, Parsed data: {parsed}")
+                if parsed and hasattr(parsed, "identity"):
+                    if parsed.identity == "GNGGA":
+                        if isinstance(raw, bytes):
+                            self._data_queue.append(
+                                raw.decode('utf-8', errors='replace'))
             except Exception as e:
-                print(f"An unexpected error occurred in the read loop: {e}")
-                self._stop_event.set() # Stop service on fatal error
+                print(f"Error reading data: {e}")
     
     def start(self):
         """
@@ -160,7 +167,7 @@ if __name__ == "__main__":
     # On Linux, this might be /dev/ttyUSB0 or /dev/ttyACM0
     # On Windows, this will be something like COM3
     SERIAL_PORT = "/dev/ttyUSB0" 
-    BAUD_RATE = 9600
+    BAUD_RATE = 115200
     
     gnss_service = GNSSService(
         port=SERIAL_PORT,
