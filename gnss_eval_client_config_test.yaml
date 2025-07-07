@@ -2,7 +2,7 @@
 
 # TCP Server Connection Settings
 tcp:
-  host: "192.168.10.137"
+  host: "192.168.10.200"
   port: 50012
 
 # Evaluation Parameters
