@@ -3,7 +3,7 @@
 # TCP Server Connection Settings
 tcp:
   host: "127.0.0.1"
-  port: 50012
+  port: 5000
 
 # Evaluation Parameters
 evaluation:

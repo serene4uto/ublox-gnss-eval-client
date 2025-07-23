@@ -1,0 +1,12 @@
+pyproj
+
+matplotlib
+pyyaml
+pandas
+
+streamlit>=1.37.0
+
+dtaidistance    
+
+
+
